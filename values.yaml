@@ -1,0 +1,68 @@
+replicaCount: 3
+
+## Value to fully override raccoon.name template
+nameOverride: ""
+## Value to fully override raccoon.fullname template
+fullnameOverride: ""
+
+labels: { "application": "raccoon" }
+
+raccoon:
+  image:
+    repository: raystack/raccoon
+    pullPolicy: IfNotPresent
+    tag: 0.2.2
+  config:
+    SERVER_WEBSOCKET_PORT: "80"
+    PUBLISHER_KAFKA_CLIENT_BOOTSTRAP_SERVERS: b-3.backendstreamsdat.d1lw48.c3.kafka.ap-southeast-1.amazonaws.com:9092,b-2.backendstreamsdat.d1lw48.c3.kafka.ap-southeast-1.amazonaws.com:9092,b-1.backendstreamsdat.d1lw48.c3.kafka.ap-southeast-1.amazonaws.com:9092
+    SERVER_WEBSOCKET_CONN_UNIQ_ID_HEADER: X-User-ID
+    SERVER_WEBSOCKET_CONN_ID_HEADER: X-User-ID
+    METRIC_STATSD_ENABLED: false
+  resources:
+    limits:
+      cpu: 200m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 512Mi
+
+service:
+  # ClusterIP: ""
+  # type: ClusterIP
+  annotations: {}
+  #   alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-1:629776801916:certificate/0b4a91e2-9024-43c8-a718-5a499fbf031c
+  #   alb.ingress.kubernetes.io/scheme: internet-facing
+  #   alb.ingress.kubernetes.io/target-type: ip
+  #   alb.ingress.kubernetes.io/backend-connection-idle-timeout: '610'
+
+telegraf:
+  enabled: false
+  image:
+    repository: telegraf
+    pullPolicy: IfNotPresent
+    tag: 1.7.4-alpine
+  config:
+    output:
+      influxdb:
+        enabled: false
+        urls:
+          - "http://localhost:8086"
+        database: "test-db"
+        retention_policy: "autogen"
+  resources:
+    limits:
+      cpu: 50m
+      memory: 64Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+ingress:
+  enabled: false
+  path: /
+  annotations: {}
+  hosts:
+    - localhost
+  tls:
+    enabled: false
+    secretName: secret
